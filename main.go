@@ -32,16 +32,16 @@ func main() {
 	handlers := map[string]http.Handler{
 		"GET /api/logout":            mw.UseJson(h(routes.LogoutGet)),
 		"GET /api/auth":              mw.UseJWTAuth(h(routes.AuthGet)),
-		"GET /api/users/{id}":        mw.UseJWTAuth(mw.UseJson(h(routes.UsersGet))),
-		"GET /api/chat-partners":     mw.UseJWTAuth(mw.UseJson(h(routes.ChatPartnersGet))),
-		"GET /api/search":            mw.UseJWTAuth(mw.UseJson(h(routes.SearchGet))),
-		"GET /api/messages/{pairId}": mw.UseJWTAuth(mw.UseJson(h(routes.MessagesGet))),
-		"GET /api/friends":           mw.UseJWTAuth(mw.UseJson(h(routes.FriendsGet))),
-		"GET /api/friend-requestors": mw.UseJWTAuth(mw.UseJson(h(routes.FriendRequestorsGet))),
+		"GET /api/users/{id}":        mw.UseJWTAuth(h(routes.UsersGet)),
+		"GET /api/chat-partners":     mw.UseJWTAuth(h(routes.ChatPartnersGet)),
+		"GET /api/search":            mw.UseJWTAuth(h(routes.SearchGet)),
+		"GET /api/messages/{pairId}": mw.UseJWTAuth(h(routes.MessagesGet)),
+		"GET /api/friends":           mw.UseJWTAuth(h(routes.FriendsGet)),
+		"GET /api/friend-requestors": mw.UseJWTAuth(h(routes.FriendRequestorsGet)),
 		"GET /ws":                    mw.UseJWTAuth(http.HandlerFunc(routes.WSHandleFunc)),
 		"GET /api/tmp":               h(routes.TmpGet),
 
-		"GET /api/friendship-status/{targetId}": mw.UseJWTAuth(mw.UseJson(h(routes.FriendshipStatusGet))),
+		"GET /api/friendship-status/{targetId}": mw.UseJWTAuth(h(routes.FriendshipStatusGet)),
 
 		"POST /api/login":           mw.UseJson(h(routes.LoginPost)),
 		"POST /api/register":        mw.UseJson(h(routes.RegisterPost)),

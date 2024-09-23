@@ -11,7 +11,7 @@ import (
 
 // Gives details of users with which the requesting user
 // has chatted before. Sorted by most recent conversation
-// date. Should be used which authentication
+// date. Should be used with authentication
 func ChatPartnersGet(w http.ResponseWriter, r *http.Request) api.Response {
 	userId := r.Context().Value("userId").(uint64)
 	log.Printf("Hit ChatPartnersGet() with userId: %v\n", userId)
