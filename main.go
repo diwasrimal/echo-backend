@@ -38,7 +38,7 @@ func main() {
 		"GET /api/messages/{pairId}": mw.UseJWTAuth(h(routes.MessagesGet)),
 		"GET /api/friends":           mw.UseJWTAuth(h(routes.FriendsGet)),
 		"GET /api/friend-requestors": mw.UseJWTAuth(h(routes.FriendRequestorsGet)),
-		"GET /ws":                    mw.UseJWTAuth(http.HandlerFunc(routes.WSHandleFunc)),
+		"GET /ws":                    mw.UseWebsocketJWTAuth(http.HandlerFunc(routes.WSHandleFunc)),
 		"GET /api/tmp":               h(routes.TmpGet),
 
 		"GET /api/friendship-status/{targetId}": mw.UseJWTAuth(h(routes.FriendshipStatusGet)),

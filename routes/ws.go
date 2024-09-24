@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -21,6 +23,15 @@ var clients = make(map[uint64]*websocket.Conn)
 var wsUp = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		for _, allowed := range strings.Split(os.Getenv("ALLOWED_ORIGINS"), ",") {
+			if origin == allowed {
+				return true
+			}
+		}
+		return false
+	},
 }
 
 type payloadMsgType string
