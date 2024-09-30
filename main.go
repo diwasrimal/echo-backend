@@ -24,6 +24,12 @@ func main() {
 		allowedOrigins = os.Getenv("ALLOWED_ORIGINS")
 	)
 
+	log.Println("Using environment vars:")
+	log.Printf("SERVER_PORT: %v\n", serverPort)
+	log.Printf("JWT_SECRET: %v\n", jwtSecret)
+	log.Printf("POSTGRES_URL: %v\n", pgUrl)
+	log.Printf("ALLOWED_ORIGINS: %v\n", allowedOrigins)
+
 	jwt.Init(jwtSecret)
 	db.MustInitPostgres(pgUrl)
 	defer db.Close()
