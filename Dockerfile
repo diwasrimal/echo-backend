@@ -9,6 +9,6 @@ RUN go build -ldflags '-s -w' -o main .
 # Use a lightweight image for final distribution
 FROM alpine:latest
 WORKDIR /app
-COPY --from=builder /app/main /app/.env.prod ./
+COPY --from=builder /app/main ./
 
 CMD ["./main"]
