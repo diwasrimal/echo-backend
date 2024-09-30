@@ -1,0 +1,24 @@
+databases:
+  - name: db
+    databaseName: echochat-db
+    user: postgres
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: server
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+
+    # https://docs.render.com/blueprint-spec#setting-environment-variables
+    envVars:
+      - key: SERVER_PORT
+        value: 3030
+      - key: POSTGRES_URL
+        fromDatabase:
+          name: db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
