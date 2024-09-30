@@ -1,13 +1,15 @@
 databases:
   - name: db
-    databaseName: echochat-db
-    user: postgres
+    plan: free
+    databaseName: echochat_db
     postgresMajorVersion: "16"
+    # user: postgres
 
 services:
   - type: web
     name: server
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
 
     # https://docs.render.com/blueprint-spec#setting-environment-variables
