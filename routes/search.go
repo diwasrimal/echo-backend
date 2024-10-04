@@ -11,7 +11,7 @@ import (
 
 // Searches for a user by their username based on the search query
 // provided search type. Search type can be "by-username" or "normal".
-// Searching by username is exact, while normal search if fuzzy.
+// Searching by username is exact, while normal search is fuzzy.
 // Should be used with auth
 func SearchGet(w http.ResponseWriter, r *http.Request) api.Response {
 	searchType := r.URL.Query().Get("type")

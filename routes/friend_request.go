@@ -3,6 +3,7 @@ package routes
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/diwasrimal/echo-backend/api"
 	"github.com/diwasrimal/echo-backend/db"
@@ -61,25 +62,23 @@ func FriendRequestPost(w http.ResponseWriter, r *http.Request) api.Response {
 	}
 }
 
-// Deletes a friend request send from requesting user to provided user
-// if the request was sent previously.
+// Deletes a friend request sent invloving requesting user and provided user
 func FriendRequestDelete(w http.ResponseWriter, r *http.Request) api.Response {
-	body := r.Context().Value("body").(types.Json)
-	log.Printf("Hit FriendRequestDelete() with body: %v\n", body)
-
 	userId := r.Context().Value("userId").(uint64)
-	tid, ok := body["targetId"].(float64)
-	if !ok {
+	log.Printf("Hit FriendRequestDelete() with userId: %v\n", userId)
+
+	tid, err := strconv.Atoi(r.PathValue("targetUserId"))
+	if err != nil {
 		return api.Response{
 			Status:  http.StatusBadRequest,
-			Payload: types.Json{"message": "Missing/Invalid targetId in body"},
+			Payload: types.Json{"message": "User id missing in path value"},
 		}
 	}
-	targetId := uint64(tid)
+	targetUserId := uint64(tid)
 
 	// Check the friendship status beforing deleting request. If request is
-	// not sent, we can't delete it
-	status, err := db.GetFriendshipStatus(userId, uint64(targetId))
+	// not sent or received, we can't delete it
+	status, err := db.GetFriendshipStatus(userId, uint64(targetUserId))
 	if err != nil {
 		log.Printf("Error getting friendship status while deleting friend req: %v\n", err)
 		return api.Response{
@@ -87,25 +86,25 @@ func FriendRequestDelete(w http.ResponseWriter, r *http.Request) api.Response {
 			Payload: types.Json{},
 		}
 	}
-	if status != "req-sent" {
+	if status == "req-sent" || status == "req-received" {
+		err = db.DeleteFriendRequest(userId, targetUserId)
+		if err != nil {
+			log.Printf("Error deleting friend request in db: %v\n", err)
+			return api.Response{
+				Status:  http.StatusInternalServerError,
+				Payload: types.Json{},
+			}
+		}
+		return api.Response{
+			Status:  http.StatusOK,
+			Payload: types.Json{},
+		}
+	} else {
 		return api.Response{
 			Status: http.StatusBadRequest,
 			Payload: types.Json{
-				"message": "Request wasn't sent, cannnot delete!",
+				"message": "Request was neither sent nor received, cannot delete!",
 			},
 		}
-	}
-
-	err = db.DeleteFriendRequest(userId, targetId)
-	if err != nil {
-		log.Printf("Error deleting friend request in db: %v\n", err)
-		return api.Response{
-			Status:  http.StatusInternalServerError,
-			Payload: types.Json{},
-		}
-	}
-	return api.Response{
-		Status:  http.StatusOK,
-		Payload: types.Json{},
 	}
 }

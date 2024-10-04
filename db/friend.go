@@ -18,13 +18,14 @@ func RecordFriendRequest(from, to uint64) error {
 	return err
 }
 
-func DeleteFriendRequest(from, to uint64) error {
+func DeleteFriendRequest(userId1, userId2 uint64) error {
 	_, err := pool.Exec(
 		context.Background(),
 		`DELETE FROM friend_requests WHERE
-			requestor_id = $1 AND receiver_id = $2`,
-		from,
-		to,
+			requestor_id = $1 AND receiver_id = $2 OR
+			requestor_id = $2 AND receiver_id = $1`,
+		userId1,
+		userId2,
 	)
 	return err
 }

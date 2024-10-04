@@ -36,7 +36,6 @@ func main() {
 
 	h := api.MakeHandler
 	handlers := map[string]http.Handler{
-		"GET /api/logout":            mw.UseJson(h(routes.LogoutGet)),
 		"GET /api/auth":              mw.UseJWTAuth(h(routes.AuthGet)),
 		"GET /api/users/{id}":        mw.UseJWTAuth(h(routes.UsersGet)),
 		"GET /api/chat-partners":     mw.UseJWTAuth(h(routes.ChatPartnersGet)),
@@ -54,8 +53,8 @@ func main() {
 		"POST /api/friend-requests": mw.UseJWTAuth(mw.UseJson(h(routes.FriendRequestPost))),
 		"POST /api/friends":         mw.UseJWTAuth(mw.UseJson(h(routes.FriendPost))),
 
-		"DELETE /api/friend-requests": mw.UseJWTAuth(mw.UseJson(h(routes.FriendRequestDelete))),
-		"DELETE /api/friends":         mw.UseJWTAuth(mw.UseJson(h(routes.FriendDelete))),
+		"DELETE /api/friend-requests/{targetUserId}": mw.UseJWTAuth(h(routes.FriendRequestDelete)),
+		"DELETE /api/friends/{targetUserId}":         mw.UseJWTAuth(h(routes.FriendDelete)),
 	}
 
 	mux := http.NewServeMux()

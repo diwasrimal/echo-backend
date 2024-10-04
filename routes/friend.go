@@ -3,6 +3,7 @@ package routes
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/diwasrimal/echo-backend/api"
 	"github.com/diwasrimal/echo-backend/db"
@@ -68,22 +69,21 @@ func FriendPost(w http.ResponseWriter, r *http.Request) api.Response {
 }
 
 func FriendDelete(w http.ResponseWriter, r *http.Request) api.Response {
-	body := r.Context().Value("body").(types.Json)
-	log.Printf("Hit FriendDelete() with body: %v\n", body)
-
 	userId := r.Context().Value("userId").(uint64)
-	tid, ok := body["targetId"].(float64)
-	if !ok {
+	log.Printf("Hit FriendDelete() with userId: %v\n", userId)
+
+	tid, err := strconv.Atoi(r.PathValue("targetUserId"))
+	if err != nil {
 		return api.Response{
 			Status:  http.StatusBadRequest,
-			Payload: types.Json{"message": "Missing/Invalid targetId in body"},
+			Payload: types.Json{"message": "User id missing in path value"},
 		}
 	}
-	targetId := uint64(tid)
+	targetUserId := uint64(tid)
 
-	err := db.DeleteFriendship(userId, targetId)
+	err = db.DeleteFriendship(userId, targetUserId)
 	if err != nil {
-		log.Printf("Error deleting friendship among (%v, %v) in db: %v\n", userId, targetId, err)
+		log.Printf("Error deleting friendship among (%v, %v) in db: %v\n", userId, targetUserId, err)
 		return api.Response{
 			Status:  http.StatusInternalServerError,
 			Payload: types.Json{},
