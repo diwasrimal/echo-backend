@@ -60,7 +60,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	for route, handler := range handlers {
-		mux.Handle(route, mw.UseLogger(handler))
+		// handler = mw.UseDelay(time.Second*2, handler) // to imitate production delay
+		handler = mw.UseLogger(handler)
+		mux.Handle(route, handler)
 	}
 
 	_ = allowedOrigins
