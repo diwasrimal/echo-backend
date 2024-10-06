@@ -106,8 +106,8 @@ func GetFriends(userId uint64) ([]models.User, error) {
 	return friends, nil // TODO: maybe add limit
 }
 
-// Returns list of users that have sent request to given user
-func GetFriendRequestorsTo(userId uint64) ([]models.User, error) {
+// Returns users that sent friend request to user with provided id
+func GetFriendRequestSenders(toUserId uint64) ([]models.User, error) {
 	var requestors []models.User
 	rows, err := pool.Query(
 		context.Background(),
@@ -115,7 +115,7 @@ func GetFriendRequestorsTo(userId uint64) ([]models.User, error) {
 			SELECT requestor_id FROM friend_requests WHERE
 			receiver_id = $1
 		)`,
-		userId,
+		toUserId,
 	)
 	if err != nil {
 		return requestors, err
@@ -129,4 +129,71 @@ func GetFriendRequestorsTo(userId uint64) ([]models.User, error) {
 		requestors = append(requestors, user)
 	}
 	return requestors, nil // TODO: maybe add limit
+}
+
+// Returns users that user with provided id has sent requests to
+func GetFriendRequestReceivers(fromUserId uint64) ([]models.User, error) {
+	var receivers []models.User
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM users WHERE id IN (
+			SELECT receiver_id FROM friend_requests WHERE
+			requestor_id = $1
+		)`,
+		fromUserId,
+	)
+	if err != nil {
+		return receivers, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user models.User
+		if err := rows.Scan(&user.Id, &user.Fullname, &user.Username, &user.PasswordHash, &user.Bio); err != nil {
+			return receivers, err
+		}
+		receivers = append(receivers, user)
+	}
+	return receivers, nil // TODO: maybe add limit
+}
+
+func GetSentFriendRequests(requestorId uint64) ([]models.FriendRequest, error) {
+	var reqs []models.FriendRequest
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM friend_requests WHERE requestor_id = $1`,
+		requestorId,
+	)
+	if err != nil {
+		return reqs, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var req models.FriendRequest
+		if err := rows.Scan(&req.RequestorId, &req.ReceiverId); err != nil {
+			return reqs, err
+		}
+		reqs = append(reqs, req)
+	}
+	return reqs, nil // TODO: maybe add limit
+}
+
+func GetReceivedFriendRequests(receiverId uint64) ([]models.FriendRequest, error) {
+	var reqs []models.FriendRequest
+	rows, err := pool.Query(
+		context.Background(),
+		`SELECT * FROM friend_requests WHERE receiver_id = $1`,
+		receiverId,
+	)
+	if err != nil {
+		return reqs, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var req models.FriendRequest
+		if err := rows.Scan(&req.RequestorId, &req.ReceiverId); err != nil {
+			return reqs, err
+		}
+		reqs = append(reqs, req)
+	}
+	return reqs, nil // TODO: maybe add limit
 }

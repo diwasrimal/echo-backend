@@ -11,9 +11,9 @@ func UseLogger(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		reqName := r.Method + " " + r.RequestURI
-		log.Printf(reqName)
+		log.Println("←", reqName)
 		next.ServeHTTP(w, r)
-		log.Printf("Took %v\n", time.Since(start))
+		log.Printf("→ %v Took %v\n", reqName, time.Since(start))
 	}
 	return http.HandlerFunc(fn)
 }

@@ -7,8 +7,38 @@ import (
 
 	"github.com/diwasrimal/echo-backend/api"
 	"github.com/diwasrimal/echo-backend/db"
+	"github.com/diwasrimal/echo-backend/models"
 	"github.com/diwasrimal/echo-backend/types"
 )
+
+func FriendRequestGet(w http.ResponseWriter, r *http.Request) api.Response {
+	userId := r.Context().Value("userId").(uint64)
+	log.Printf("Hit FriendRequestGet() with userId: %v\n", userId)
+
+	reqType := r.URL.Query().Get("type")
+	if reqType != "sent" && reqType != "received" {
+		return api.Response{
+			Status:  http.StatusBadRequest,
+			Payload: types.Json{"message": "Invalid friend request type in url params, should be 'sent' or 'recieved'"},
+		}
+	}
+
+	var reqs []models.FriendRequest
+	var err error
+	if reqType == "sent" {
+		reqs, err = db.GetSentFriendRequests(userId)
+	} else {
+		reqs, err = db.GetReceivedFriendRequests(userId)
+	}
+	if err != nil {
+		log.Printf("%T getting friend requests from db: %[1]v\n", err)
+		return api.InternalErrorResp
+	}
+	return api.Response{
+		Status:  http.StatusOK,
+		Payload: types.Json{"friendRequests": reqs},
+	}
+}
 
 // Records a new entry into the friend requests table.
 // Accepts json payload with field "targetId", which is the user

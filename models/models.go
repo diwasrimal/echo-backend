@@ -28,3 +28,8 @@ type Conversation struct {
 	UserId2   uint64    `json:"userId2"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+type FriendRequest struct {
+	RequestorId uint64 `json:"requestorId"`
+	ReceiverId  uint64 `json:"receiverId"`
+}

@@ -42,9 +42,10 @@ func main() {
 		"GET /api/search":            mw.UseJWTAuth(h(routes.SearchGet)),
 		"GET /api/messages/{pairId}": mw.UseJWTAuth(h(routes.MessagesGet)),
 		"GET /api/friends":           mw.UseJWTAuth(h(routes.FriendsGet)),
-		"GET /api/friend-requestors": mw.UseJWTAuth(h(routes.FriendRequestorsGet)),
 		"GET /ws":                    mw.UseWebsocketJWTAuth(http.HandlerFunc(routes.WSHandleFunc)),
 		"GET /api/tmp":               h(routes.TmpGet),
+
+		"GET /api/friend-requests": mw.UseJWTAuth(h(routes.FriendRequestGet)),
 
 		"GET /api/friendship-status/{targetId}": mw.UseJWTAuth(h(routes.FriendshipStatusGet)),
 
@@ -64,7 +65,6 @@ func main() {
 		mux.Handle(route, handler)
 	}
 
-	_ = allowedOrigins
 	handler := cors.New(cors.Options{
 		AllowedOrigins:   strings.Split(allowedOrigins, ","),
 		AllowedHeaders:   []string{"*"},
